@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">GeoQuiz</string>
-    <string name="question_text">Canberra is the capital of Australia</string>
+    <string name="question_australia">Canberra is the capital of Australia</string>
+    <string name="question_1">Question 1: even</string>
+    <string name="question_2">Question 2: even</string>
+    <string name="question_3">Question 3: even</string>
+    <string name="question_4">Question 4: even</string>
+    <string name="question_5">Question 5: even</string>
     <string name="true_button">True</string>
     <string name="false_button">False</string>
     <string name="toast_correct">Correct!</string>
     <string name="toast_incorrect">Incorrect!</string>
+    <string name="next_button">Next</string>
+    <string name="prev_button">Previous question</string>
 </resources>
