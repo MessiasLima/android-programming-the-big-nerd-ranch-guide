@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/ic_arrow_right.xml" value="0.3775" />
+        <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.34171075837742504" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.4036458333333333" />
       </map>
     </option>

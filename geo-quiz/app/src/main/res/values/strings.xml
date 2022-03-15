@@ -12,4 +12,5 @@
     <string name="toast_incorrect">Incorrect!</string>
     <string name="next_button">Next</string>
     <string name="prev_button">Previous question</string>
+    <string name="result">You got %f percent</string>
 </resources>
