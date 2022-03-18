@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
@@ -17,24 +18,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prevButton: ImageButton
     private lateinit var questionTextView: TextView
 
-    private val questionBank = listOf(
-        Question(R.string.question_australia, true),
-        Question(R.string.question_1, false),
-        Question(R.string.question_2, true),
-        Question(R.string.question_3, false),
-        Question(R.string.question_4, true),
-        Question(R.string.question_5, false),
-    )
-
-    private var currentIndex = 0
-    private val currentQuestion: Question
-        get() = questionBank[currentIndex]
+    private val viewModel by lazy {
+        ViewModelProvider(this).get(QuizViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
         setContentView(R.layout.activity_main)
-
+        viewModel.currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
@@ -95,27 +87,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun nextQuestion() {
-        currentIndex = (currentIndex + 1) % questionBank.size
+        viewModel.nextQuestion()
         updateQuestion()
     }
 
     private fun previousQuestion() {
-        currentIndex = (currentIndex - 1) % questionBank.size
+        viewModel.previousQuestion()
         updateQuestion()
     }
 
     private fun updateQuestion() {
-        trueButton.isEnabled = !currentQuestion.wasAnswered
-        falseButton.isEnabled = !currentQuestion.wasAnswered
-        nextButton.isEnabled = currentIndex < (questionBank.size - 1)
-        prevButton.isEnabled = currentIndex >= 1
-        questionTextView.setText(currentQuestion.textResId)
+        trueButton.isEnabled = !viewModel.currentQuestion.wasAnswered
+        falseButton.isEnabled = !viewModel.currentQuestion.wasAnswered
+        nextButton.isEnabled = viewModel.isNextButtonEnabled()
+        prevButton.isEnabled = viewModel.isPreviousButtonEnabled()
+        questionTextView.setText(viewModel.currentQuestion.textResId)
     }
 
     private fun submitAnswer(answer: Boolean) {
-        currentQuestion.wasAnswered = true
-        val message = if (answer == currentQuestion.answer) {
-            currentQuestion.answeredCorrectly = true
+        viewModel.currentQuestion.wasAnswered = true
+        val message = if (answer == viewModel.currentQuestion.answer) {
+            viewModel.currentQuestion.answeredCorrectly = true
             R.string.toast_correct
         } else {
             R.string.toast_incorrect
@@ -127,15 +119,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkShowResultEligibility() {
-        if (questionBank.all { it.wasAnswered }) {
+        if (viewModel.isEligibleToShowResult()) {
             showResult()
         }
     }
 
     private fun showResult() {
-        val ratio = questionBank.count { it.answeredCorrectly } / questionBank.size.toFloat()
-        val percentage = ratio * 100
-        showToast(getString(R.string.result, percentage))
+        showToast(getString(R.string.result, viewModel.getAccuracyPercentage()))
     }
 
     private fun showToast(@StringRes message: Int) {
@@ -150,7 +140,13 @@ class MainActivity : AppCompatActivity() {
         toast.show()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_INDEX, viewModel.currentIndex)
+    }
+
     companion object {
         private const val TAG = "MainActivity"
+        private const val KEY_INDEX = "index"
     }
 }
